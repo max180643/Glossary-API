@@ -159,7 +159,7 @@ router.post('/create', async (req, res) => {
 // get search query glossary
 router.get('/search', async (req, res) => {
   try {
-    const { query } = req.query;
+    const { query, type } = req.query;
 
     const fuseOptions = {
       keys: [
@@ -168,7 +168,8 @@ router.get('/search', async (req, res) => {
       ],
     };
 
-    const data = await firebase.firestore().collection('Glossary').get()
+    const data = type === 'official' ? await firebase.firestore().collection('Glossary').where('type', '==', 'official').get()
+      .then((querySnapshot) => querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }))) : await firebase.firestore().collection('Glossary').get()
       .then((querySnapshot) => querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
 
     const fuse = new Fuse(data, fuseOptions);
