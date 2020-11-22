@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const firebase = require('firebase');
 const { nanoid } = require('nanoid');
+const Fuse = require('fuse.js');
 const verify = require('./verifyToken');
 
 require('firebase/firestore');
@@ -30,6 +31,25 @@ router.get('/', verify, (req, res) => {
 router.get('/public', async (req, res) => {
   try {
     const data = await firebase.firestore().collection('Glossary').get()
+      .then((querySnapshot) => querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+
+    res.send({
+      status: 'success',
+      response: data,
+    }, 200);
+  } catch (error) {
+    res.send({
+      status: 'failure',
+      response: 'Something went wrong. Please try again later.',
+      error,
+    }, 500);
+  }
+});
+
+// get top glossary
+router.get('/top', async (req, res) => {
+  try {
+    const data = await firebase.firestore().collection('Glossary').orderBy('like', 'desc').get()
       .then((querySnapshot) => querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
 
     res.send({
@@ -127,6 +147,36 @@ router.post('/create', async (req, res) => {
         response: data.response,
       }, 201);
     }
+  } catch (error) {
+    res.send({
+      status: 'failure',
+      response: 'Something went wrong. Please try again later.',
+      error,
+    }, 500);
+  }
+});
+
+// get search query glossary
+router.get('/search', async (req, res) => {
+  try {
+    const { query } = req.query;
+
+    const fuseOptions = {
+      keys: [
+        'id',
+        'name',
+      ],
+    };
+
+    const data = await firebase.firestore().collection('Glossary').get()
+      .then((querySnapshot) => querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
+
+    const fuse = new Fuse(data, fuseOptions);
+
+    res.send({
+      status: 'success',
+      response: await fuse.search(query).map((item) => item.item),
+    }, 200);
   } catch (error) {
     res.send({
       status: 'failure',
