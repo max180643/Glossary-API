@@ -7,5 +7,6 @@ module.exports = {
     'airbnb-base',
   ],
   rules: {
+    camelcase: [0],
   },
 };

@@ -35,11 +35,78 @@ const genPrivateID = async () => {
   return isExist;
 };
 
+// create new glossary
+router.post('/glossary', async (req, res) => {
+  try {
+    const {
+      name, description, type, owner, owner_id, glossary,
+    } = req.body;
+
+    countLimit = 0;
+
+    let id;
+
+    if (type === 'private') {
+      id = await genPrivateID();
+    } else {
+      id = await genPublicID();
+    }
+
+    const data = (id === 'timeout') ? { status: 'failure', response: 'Timeout! can\'t generate ID. Please try again later.', code: 500 } : await firebase.firestore()
+      .collection(type === 'private' ? 'GlossaryPrivate' : 'Glossary')
+      .doc(id)
+      .set({
+        name,
+        description,
+        like: 0,
+        type,
+        owner,
+        created: firebase.firestore.FieldValue.serverTimestamp(),
+      })
+      .then(async () => {
+        await firebase.firestore()
+          .collection('GlossaryData').doc(id).set({
+            data: glossary,
+          });
+      })
+      .then(() => ({
+        status: 'success',
+        response: {
+          id,
+          name,
+          description,
+          type,
+          owner,
+          owner_id,
+          glossary,
+        },
+      }));
+
+    if (data.status === 'failure') {
+      res.send({
+        status: data.status,
+        response: data.response,
+      }, data.code);
+    } else {
+      res.send({
+        status: data.status,
+        response: data.response,
+      }, 201);
+    }
+  } catch (error) {
+    res.send({
+      status: 'failure',
+      response: 'Something went wrong. Please try again later.',
+      error,
+    }, 500);
+  }
+});
+
 // create new public glossary
 router.post('/public', async (req, res) => {
   try {
     const {
-      name, description, like, type, owner,
+      name, description, like, type, owner, owner_id,
     } = req.body;
 
     countLimit = 0;
@@ -54,6 +121,7 @@ router.post('/public', async (req, res) => {
         like,
         type,
         owner,
+        owner_id,
         created: firebase.firestore.FieldValue.serverTimestamp(),
       })
       .then(() => ({
@@ -65,6 +133,7 @@ router.post('/public', async (req, res) => {
           like,
           type,
           owner,
+          owner_id,
         },
       }));
 
@@ -92,7 +161,7 @@ router.post('/public', async (req, res) => {
 router.post('/private', async (req, res) => {
   try {
     const {
-      name, description, like, type, owner,
+      name, description, like, type, owner, owner_id,
     } = req.body;
 
     countLimit = 0;
@@ -107,6 +176,7 @@ router.post('/private', async (req, res) => {
         like,
         type,
         owner,
+        owner_id,
         created: firebase.firestore.FieldValue.serverTimestamp(),
       })
       .then(() => ({
@@ -118,6 +188,7 @@ router.post('/private', async (req, res) => {
           like,
           type,
           owner,
+          owner_id,
         },
       }));
 
