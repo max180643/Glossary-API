@@ -61,6 +61,7 @@ router.post('/glossary', async (req, res) => {
         like: 0,
         type,
         owner,
+        owner_id,
         created: firebase.firestore.FieldValue.serverTimestamp(),
       })
       .then(async () => {
