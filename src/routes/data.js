@@ -167,7 +167,30 @@ router.get('/glossary', async (req, res) => {
   }
 });
 
-module.exports = router;
+// delete public or private glossary by id
+router.get('/delete', async (req, res) => {
+  try {
+    const { id, type } = req.query;
 
-// todo
-// - type validation (create)
+    // todo - check element exists
+
+    if (type === 'private') {
+      await firebase.firestore().collection('GlossaryPrivate').doc(id).delete();
+    } else {
+      await firebase.firestore().collection('Glossary').doc(id).delete();
+    }
+
+    res.send({
+      status: 'success',
+      response: `#${id} successfully deleted!`,
+    }, 200);
+  } catch (error) {
+    res.send({
+      status: 'failure',
+      response: 'Something went wrong. Please try again later.',
+      error,
+    }, 500);
+  }
+});
+
+module.exports = router;

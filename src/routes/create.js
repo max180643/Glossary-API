@@ -142,3 +142,6 @@ router.post('/private', async (req, res) => {
 });
 
 module.exports = router;
+
+// todo
+// - type validation (create)
