@@ -147,9 +147,9 @@ router.get('/glossary', async (req, res) => {
   try {
     const { id } = req.query;
 
-    const publicData = await firebase.firestore().collection('Glossary').where('owner', '==', id).get()
+    const publicData = await firebase.firestore().collection('Glossary').where('owner_id', '==', id).get()
       .then((querySnapshot) => querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
-    const privateData = await firebase.firestore().collection('GlossaryPrivate').where('owner', '==', id).get()
+    const privateData = await firebase.firestore().collection('GlossaryPrivate').where('owner_id', '==', id).get()
       .then((querySnapshot) => querySnapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() })));
 
     const data = [...publicData, ...privateData].sort(SortOrder('created', 'seconds'));
