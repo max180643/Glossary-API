@@ -180,6 +180,8 @@ router.get('/delete', async (req, res) => {
       await firebase.firestore().collection('Glossary').doc(id).delete();
     }
 
+    await firebase.firestore().collection('GlossaryData').doc(id).delete();
+
     res.send({
       status: 'success',
       response: `#${id} successfully deleted!`,
