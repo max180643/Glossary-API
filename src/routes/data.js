@@ -167,6 +167,26 @@ router.get('/glossary', async (req, res) => {
   }
 });
 
+// get public & private glossary data by id
+router.get('/glossary_data', async (req, res) => {
+  try {
+    const { id } = req.query;
+
+    const data = await firebase.firestore().collection('GlossaryData').doc(id).get()
+      .then((doc) => doc.data());
+    res.send({
+      status: 'success',
+      response: data,
+    }, 200);
+  } catch (error) {
+    res.send({
+      status: 'failure',
+      response: 'Something went wrong. Please try again later.',
+      error,
+    }, 500);
+  }
+});
+
 // delete public or private glossary by id
 router.get('/delete', async (req, res) => {
   try {
