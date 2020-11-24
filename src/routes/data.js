@@ -176,7 +176,7 @@ router.get('/glossary_data', async (req, res) => {
       .then((doc) => doc.data());
     res.send({
       status: 'success',
-      response: data,
+      response: data.data,
     }, 200);
   } catch (error) {
     res.send({
