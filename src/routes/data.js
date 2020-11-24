@@ -215,4 +215,60 @@ router.get('/delete', async (req, res) => {
   }
 });
 
+// like glossary
+router.get('/like', async (req, res) => {
+  try {
+    const { id, user_id } = req.query;
+
+    const data = await firebase.firestore().collection('Glossary').doc(id).get()
+      .then((doc) => doc.data());
+
+    const likeArray = data.like;
+    likeArray.push(user_id.toString());
+
+    await firebase.firestore().collection('Glossary').doc(id).update({
+      like: likeArray,
+    });
+
+    res.send({
+      status: 'success',
+      response: `User: #${user_id} liked #${id} successfully deleted!`,
+    }, 200);
+  } catch (error) {
+    res.send({
+      status: 'failure',
+      response: 'Something went wrong. Please try again later.',
+      error,
+    }, 500);
+  }
+});
+
+// unlike glossary
+router.get('/unlike', async (req, res) => {
+  try {
+    const { id, user_id } = req.query;
+
+    const data = await firebase.firestore().collection('Glossary').doc(id).get()
+      .then((doc) => doc.data());
+
+    const likeArray = data.like;
+    const likeArrayFilter = likeArray.filter((item) => (item !== user_id.toString()));
+
+    await firebase.firestore().collection('Glossary').doc(id).update({
+      like: likeArrayFilter,
+    });
+
+    res.send({
+      status: 'success',
+      response: `User: #${user_id} unliked #${id} successfully deleted!`,
+    }, 200);
+  } catch (error) {
+    res.send({
+      status: 'failure',
+      response: 'Something went wrong. Please try again later.',
+      error,
+    }, 500);
+  }
+});
+
 module.exports = router;

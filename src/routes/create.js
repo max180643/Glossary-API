@@ -58,7 +58,7 @@ router.post('/glossary', async (req, res) => {
       .set({
         name,
         description,
-        like: 0,
+        like: [],
         type,
         owner,
         owner_id,
