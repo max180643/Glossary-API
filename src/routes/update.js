@@ -7,7 +7,9 @@ require('dotenv').config();
 
 router.post('/glossary_data', async (req, res) => {
   try {
-    const { id, data } = req.query;
+    const {
+      id, data,
+    } = req.body;
 
     await firebase.firestore().collection('GlossaryData').doc(id).update({
       data,
