@@ -22,6 +22,6 @@ app.use(cors());
 app.use('/api/auth', authRoute);
 app.use('/api/data', dataRoute);
 app.use('/api/create', createRoute);
-app.use('/api/update', createRoute);
+app.use('/api/update', updateRoute);
 
 app.listen(port, () => console.log('Server running at port %d.', port));
